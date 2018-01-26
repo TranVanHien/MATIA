@@ -9,6 +9,7 @@ import httplib, urllib, base64, json
 import time
 import sys
 
+# get azure captions, 
 def get_azure_caption(file_name,input_caption):
 	###############################################
 	#### Update or verify the following values. ###
@@ -41,7 +42,7 @@ def get_azure_caption(file_name,input_caption):
 
 	# The URL of a JPEG image to analyze.
 	#body = "{'url':'https://upload.wikimedia.org/wikipedia/commons/1/12/Broadway_and_Times_Square_by_night.jpg'}"
-	start_time = time.clock()
+	#start_time = time.clock()
 	try:
 		# Execute the REST API call and get the response.
 		conn = httplib.HTTPSConnection('westcentralus.api.cognitive.microsoft.com')

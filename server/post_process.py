@@ -15,6 +15,7 @@ import random
 LANGUAGE = "english"
 SENTENCES_COUNT = 7
 
+# class for caption box
 class Box:
 	x = 0.0
 	y = 0.0
@@ -46,6 +47,7 @@ class Box:
 	def tostring(self):
 		return str(self.x)+" "+str(self.y)+" "+str(self.width)+" "+str(self.height)
 
+# summarize the captions
 def summarize_file(file_name):
 	#url = "http://www.zsstritezuct.estranky.cz/clanky/predmety/cteni/jak-naucit-dite-spravne-cist.html"
 	#parser = HtmlParser.from_url(url, Tokenizer(LANGUAGE))
@@ -62,6 +64,7 @@ def summarize_file(file_name):
 		list_sentences.append(str(sentence))
 	return list_sentences
 
+# perform paraphrasing
 def paraphrase(captions_boxes_map):
 	for sentence in captions_boxes_map.keys():
 		tmp_sentence = sentence
@@ -105,7 +108,8 @@ def paraphrase(captions_boxes_map):
 				tmp_sentence = "to your right, "+tmp_sentence
 		captions_boxes_map[tmp_sentence] = captions_boxes_map.pop(sentence)
 	return
-   
+
+# perform post process on dense captions   
 def post_process_captions():	 
 	captions = []
 	boxes = []

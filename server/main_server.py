@@ -25,12 +25,18 @@ from azure_caption import get_azure_caption
 from dense_caption import densecap_from_file
 from post_process import post_process_captions
 
+# get captions of image, input is the path to image
 def perform_captioning(image_filename):
 	manager = multiprocessing.Manager()
 	return_dict = manager.dict()
 	#azure_caps = get_azure_caption(args[1])
+	
+	# Note: need to renew key in azure_caption.py
+	# create process to get azure cap. 
 	#azure_process = multiprocessing.Process(target=get_azure_caption,args=(image_filename,return_dict))
+
 	#densecap_from_file(args[1])
+	# create process to get dense cap
 	densecap_process = multiprocessing.Process(target=densecap_from_file,args=(image_filename,))
 
 	#azure_process.start()
@@ -55,6 +61,7 @@ class SimpleHTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 	# Simple HTTP request handler with POST commands.
 	file_extension = ""
 	
+	# handling POST request
 	def do_POST(self):
 		"""Serve a POST request."""
 		r, info = self.deal_post_data()
@@ -69,6 +76,8 @@ class SimpleHTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 		length = f.tell()
 		#f.seek(0)
 		#data = {'sender':   'Alice','receiver': 'Bob','message':  'We did it!'}
+		
+		# call captioning function and dump captions into json data
 		data = {'captions':perform_captioning("tmp.jpg")}	
 		data_json = json.dumps(data)
 			
@@ -80,17 +89,19 @@ class SimpleHTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 		self.send_header("Content-Length", str(len(data_json)))
 		self.end_headers()
 		
-		
+		# return the json data to client
 		self.wfile.write(str(data_json))
 		#if f:
 		#	self.copyfile(f, self.wfile)
 		#	f.close()
 		return
-
+	
+	# receive data (image) sent by client
 	def deal_post_data(self):
 		print self.headers
+		# get boundary of data stream
 		boundary = self.headers.plisttext.split("=")[1]
-		
+		# get headers content
 		print 'Boundary %s' %boundary
 		remainbytes = int(self.headers['content-length'])
 		print "Remain Bytes %s" %remainbytes
@@ -108,10 +119,10 @@ class SimpleHTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 		print "remainbytes: ",remainbytes
 		try:
 			#out = open(fn, 'wb')
-			out = open("tmp.jpg",'wb')
+			out = open("imgs/tmp.jpg",'wb')
 		except IOError:
 			return (False, "Can't create file to write, do you have permission to write?")
-		
+		# read empty lines
 		while line.strip():
 			print "line strip true: ",line.strip(),len(line)
 			line = self.rfile.readline()
@@ -121,7 +132,8 @@ class SimpleHTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 			print "line strip false: ",line.strip()
 			preline = self.rfile.readline()		
 		remainbytes -= len(preline)
-		
+
+		# read image data and write to file on server
 		while remainbytes > 0:
 			line = self.rfile.readline()
 			remainbytes -= len(line)
